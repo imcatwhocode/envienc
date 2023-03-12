@@ -40,6 +40,14 @@ export function deriveKey(password: string, salt: string): CipherKey {
 }
 
 /**
+ * Generates salt for KDF
+ * @returns Password KDF salt
+ */
+export function generateSalt(): string {
+  return randomBytes(16).toString('hex');
+}
+
+/**
  * Encrypts data
  * @param key Encryption key
  * @param plaintext Plaintext (unencrypted) data

@@ -1,7 +1,7 @@
 {
   "name": "envienc",
   "version": "1.0.0",
-  "description": "CLI tool to encrypt env file values",
+  "description": "🔐 Tool for dotenv values encryption",
   "main": "dest/index.js",
   "repository": "https://github.com/imcatwhocode/encenv",
   "author": "Dmitry Pepperstein <hi@imcatwhocode.dev>",

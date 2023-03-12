@@ -1,23 +1,32 @@
-import { globSync } from 'glob';
-import { readFileSync } from 'fs';
-import { pbkdf2Sync } from 'crypto';
-import { join } from 'path';
-import { findPlaintext } from './glob';
+import { program } from 'commander';
+import initAction from './actions/init';
+import encryptAction from './actions/encrypt';
 
-// /^[a-zA-Z_]{1,}[a-zA-Z0-9_]{0,}=(.*)$/m
+program
+  .name('envienc')
+  .description('🔐 Tool for dotenv values encryption');
 
-// const globs = globSync('/tmp/aa/**/.env');
-// const files = globs.map(path => readFileSync(path, 'utf-8'));
+program
+  .command('init')
+  .summary('Generates configuration file')
+  .option('-g, --glob <glob...>', 'glob matching environment files')
+  .action(initAction);
 
-// const file = files[0];
+program
+  .command('encrypt')
+  .summary('Encrypts dotenv values')
+  .argument('[globs...]', 'Globs to encrypt. If defined, globs from ".enviencrc" will be ignored')
+  .option('-p, --password <password>', 'Encryption password. Alternatively can be supplied via "ENVIENC_PWD" environment variable')
+  .option('-e, --exclude [glob]', 'Excluding glob. Files matched with this glob will be skipped')
+  .action(encryptAction);
 
-// const replacer = (entireMatch: string, key: string, value: string, offset: number) => `${key}=[ENCRYPTED::${value.substring(0, 5)}]`;
+// program
+//   .command('decrypt')
+//   .description('Decrypts dotenv values')
+//   .summary('Encrypts dotenv values')
+//   .argument('[globs...]', 'Globs to encrypt. If defined, globs from ".enviencrc" will be ignored')
+//   .option('-p, --password <password>', 'Encryption password. Alternatively can be supplied via "ENVIENC_PWD" environment variable')
+//   .option('-e, --exclude [glob]', 'Excluding glob. Files matched with this glob will be skipped')
+//   .action(decryptAction);
 
-// const f = file.replaceAll(/^([a-zA-Z_]{1,}[a-zA-Z0-9_]{0,})=(.*)$/gm, replacer);
-
-// console.log(f);
-
-// console.log(pbkdf2Sync('foobar', '1234567890abcdef', 1000, 32, 'sha256').length);
-
-// const files = findPlaintext([join(__dirname, './dir/**/.env.*')]);
-// console.log(files);
+program.parse();

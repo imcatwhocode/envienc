@@ -17,6 +17,7 @@
     "start": "node dest/index.js",
     "build": "tsc",
     "build:watch": "tsc --watch",
+    "lint": "eslint src tests",
     "test": "jest --verbose",
     "test:coverage": "jest --coverage --collectCoverageFrom=src/**/*.ts"
   },

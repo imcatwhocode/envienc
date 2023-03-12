@@ -1,6 +1,8 @@
 import { globSync } from 'glob';
 import { readFileSync } from 'fs';
 import { pbkdf2Sync } from 'crypto';
+import { join } from 'path';
+import { findPlaintext } from './glob';
 
 // /^[a-zA-Z_]{1,}[a-zA-Z0-9_]{0,}=(.*)$/m
 
@@ -15,4 +17,7 @@ import { pbkdf2Sync } from 'crypto';
 
 // console.log(f);
 
-console.log(pbkdf2Sync('foobar', '1234567890abcdef', 1000, 32, 'sha256').length);
+// console.log(pbkdf2Sync('foobar', '1234567890abcdef', 1000, 32, 'sha256').length);
+
+// const files = findPlaintext([join(__dirname, './dir/**/.env.*')]);
+// console.log(files);

@@ -1,4 +1,10 @@
-import { globSync } from 'glob';
+import { statSync } from 'fs';
+import { GlobOptionsWithFileTypesFalse, globSync } from 'glob';
+
+export type AbstractFind = (
+  patterns?: string[],
+  opts?: GlobOptionsWithFileTypesFalse
+) => string[];
 
 /**
  * Extension for encrypted files
@@ -6,13 +12,33 @@ import { globSync } from 'glob';
 export const EXTENSION = '.envienc';
 
 /**
+ * Default glob covering all dotenvs
+ */
+export const DEFAULT_DOTENV_GLOB = ['**/.env', '**/.env.*'];
+
+/**
+ * Checks is file envienc-rypted
+ * @param p Absolute path
+ * @returns True, if file is likely encrypted. False otherwise
+ */
+const isEncrypted = (p: string) => p.endsWith(EXTENSION);
+
+/**
+ * Checks is path refers to a file
+ * @param p Absolute path
+ * @returns True, if file. False otherwise.
+ */
+const isFile = (p: string) => statSync(p).isFile();
+
+/**
  * Performs glob lookup, then returns found paths
  * @param patterns Globs to search
  * @param exclude Globs to exclude/ignore
  * @returns Absolute paths to files
  */
-export function findEntries(patterns: string[], exclude: string[]): string[] {
-  return globSync(patterns, { ignore: exclude, absolute: true });
+export function findEntries(patterns: string[], opts: GlobOptionsWithFileTypesFalse) {
+  return globSync(patterns, opts)
+    .filter(p => isFile(p));
 }
 
 /**
@@ -21,9 +47,10 @@ export function findEntries(patterns: string[], exclude: string[]): string[] {
  * @param exclude Globs to exclude/ignore
  * @returns Absolute paths to files
  */
-export function findPlaintext(patterns: string[], exclude: string[]): string[] {
-  return findEntries(patterns, exclude);
-}
+const findPlaintext: AbstractFind = (patterns = DEFAULT_DOTENV_GLOB, opts = {}) => {
+  const paths = findEntries(patterns, opts);
+  return paths.filter(p => !isEncrypted(p));
+};
 
 /**
  * Performs glob lookup for encrypted files.
@@ -32,9 +59,9 @@ export function findPlaintext(patterns: string[], exclude: string[]): string[] {
  * @param exclude Globs to exclude/ignore
  * @returns Absolute paths to files
  */
-export function findEncrypted(patterns: string[], exclude: string[]): string[] {
-  return findEntries(
-    patterns.map(p => p.concat(EXTENSION)),
-    exclude.map(p => p.concat(EXTENSION)),
-  );
-}
+const findEncrypted: AbstractFind = (patterns = DEFAULT_DOTENV_GLOB, opts = {}) => {
+  const paths = findEntries(patterns, opts);
+  return paths.filter(p => isEncrypted(p));
+};
+
+export { findPlaintext, findEncrypted };

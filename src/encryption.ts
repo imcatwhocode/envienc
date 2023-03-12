@@ -17,7 +17,7 @@ const CIPHER: CipherGCMTypes = 'aes-256-gcm';
 /**
  * Number of KDF iterations
  */
-const KDF_ITERATIONS = 1000;
+const KDF_ITERATIONS = 600000;
 
 /**
  * Size of derived key

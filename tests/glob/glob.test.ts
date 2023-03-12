@@ -13,12 +13,13 @@ test('enumerates plaintext .env in directory', () => {
 });
 
 test('enumerates encrypted .env in directory', () => {
-  expect(findEncrypted().length).toEqual(3);
+  expect(findEncrypted().length).toEqual(4);
 
   const paths = findEncrypted(undefined, { absolute: false });
   expect(paths).toEqual([
     'tests/glob/dir/.env.envienc',
     'tests/glob/dir/foo/.env.prod.envienc',
+    'tests/glob/dir/foo/bar/.env.prod.envienc',
     'tests/glob/dir/foo/bar/.env.envienc',
   ]);
 });

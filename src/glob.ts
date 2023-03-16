@@ -60,7 +60,7 @@ const findPlaintext: AbstractFind = (patterns = DEFAULT_DOTENV_GLOB, opts = {}) 
  * @returns Absolute paths to files
  */
 const findEncrypted: AbstractFind = (patterns = DEFAULT_DOTENV_GLOB, opts = {}) => {
-  const paths = findEntries(patterns, opts);
+  const paths = findEntries(patterns.map(p => p.concat(EXTENSION)), opts);
   return paths.filter(p => isEncrypted(p));
 };
 

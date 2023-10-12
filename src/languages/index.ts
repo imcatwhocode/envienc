@@ -1,35 +1,46 @@
+import { Parser } from '../types';
 import dotenv from './dotenv';
 import yaml from './yaml';
 
-const YAML_EXTENSIONS = ['.yml', '.yaml'];
+/**
+ * Simple heuristic to determine if a file is YAML-like.
+ * Rules:
+ * - Start with optional whitespace
+ * - Have non-whitespace, non-hash characters before a colon
+ * - Have a colon followed by whitespace and then any character
+ */
+const YAML_LIKE_REGEX = /^\s*[^#\s]+:\s*.+$/;
 
-const getNthExtension = (filename: string, n: number) => {
-  let dotIndex = filename.lastIndexOf('.');
-  for (let i = 1; i < n; i += 1) {
-    dotIndex = filename.lastIndexOf('.', dotIndex - 1);
-    if (dotIndex === -1) {
-      return '';
-    }
-  }
-  const extension = filename.slice(dotIndex + 1);
-  return extension;
-};
+/**
+ * Simple heuristic to determine if a file is dotenv-like
+ */
+const DOTENV_LIKE_REGEX = /^[A-Z_]+=.+$/gm;
 
-const getByFilename = (filename: string) => {
-  const extension = getNthExtension(filename, 1);
-  if (extension === 'envienc') {
-    const originalExtension = getNthExtension(filename, 2);
-    if (YAML_EXTENSIONS.includes(originalExtension)) {
-      return yaml;
-    }
-    return dotenv;
-  }
-
-  if (YAML_EXTENSIONS.includes(extension)) {
+const getParserUsingHeuristics = (name: string, contents: string): Parser => {
+  if (contents.match(YAML_LIKE_REGEX)) {
     return yaml;
   }
 
-  return dotenv;
+  if (contents.match(DOTENV_LIKE_REGEX)) {
+    return dotenv;
+  }
+
+  throw new Error(`Could not determine file type: ${name}`);
 };
 
-export default getByFilename;
+export default function getParser(name: string, contents: string): Parser {
+  // For encrypted files, drop the envienc extension and dive into recursion
+  if (name.endsWith('.envienc')) {
+    return getParser(name.split('.').slice(0, -1).join('.'), contents);
+  }
+
+  if (name.endsWith('.yml') || name.endsWith('.yaml')) {
+    return yaml;
+  }
+
+  if (name.startsWith('.env')) {
+    return dotenv;
+  }
+
+  return getParserUsingHeuristics(name, contents);
+}

@@ -1,6 +1,11 @@
 export type EncryptFile = (file: string, encryptor: KeyedEncryptor) => string;
 export type DecryptFile = (file: string, decryptor: KeyedDecryptor) => string;
 
+export type Parser = {
+  encryptFile: EncryptFile,
+  decryptFile: DecryptFile
+};
+
 /**
  * Type representing generic metadata object for Envienc v2 format
  */

@@ -1,5 +1,5 @@
 import { writeConfig } from '../config';
-import { generateSalt } from '../encryption';
+import { generateSalt } from '../crypto';
 import { out } from '../output';
 
 /**

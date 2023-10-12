@@ -10,7 +10,7 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": false,
-    "sourceMap": false,
+    "sourceMap": false
   },
   "files": ["src/index.ts"]
 }

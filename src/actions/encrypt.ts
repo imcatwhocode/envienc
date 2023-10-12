@@ -1,16 +1,9 @@
-import { CipherKey } from 'crypto';
 import { readFileSync, writeFileSync } from 'fs';
 import { readConfig } from '../config';
-import { deriveKey, encrypt } from '../encryption';
+import { ignite } from '../encryption';
 import { EXTENSION, findPlaintext } from '../glob';
 import { out, err } from '../output';
-import { Replacer, replaceValues } from '../tokenizer';
-import { encode } from '../encoder';
-
-const encrypter = (encryptionKey: CipherKey): Replacer => (entry, key, value) => {
-  const encrypted = encrypt(encryptionKey, Buffer.from(value, 'utf-8'));
-  return `${key}=${encode(encrypted)}`;
-};
+import getByFilename from '../languages';
 
 /**
  * Implements "encrypt" action
@@ -44,11 +37,12 @@ export default function encryptAction(
     process.exit(0);
   }
 
-  const key = deriveKey(password, config.salt);
-  const keyedEncrypter = encrypter(key);
+  const { encryptor } = ignite(password, config.salt);
+
   const changes: [string, string][] = paths.map(path => {
+    const { encryptFile } = getByFilename(path);
     let contents = readFileSync(path, 'utf-8');
-    contents = replaceValues(contents, keyedEncrypter);
+    contents = encryptFile(contents, encryptor);
     return [path.concat(EXTENSION), contents];
   });
 

@@ -1,17 +1,9 @@
-import { CipherKey } from 'crypto';
 import { readFileSync, writeFileSync } from 'fs';
 import { readConfig } from '../config';
-import { decrypt, deriveKey } from '../encryption';
+import { ignite } from '../encryption';
 import { findEncrypted } from '../glob';
+import getByFilename from '../languages';
 import { out, err } from '../output';
-import { Replacer, replaceValues } from '../tokenizer';
-import { decode } from '../encoder';
-
-const decrypter = (encryptionKey: CipherKey): Replacer => (entry, key, value) => {
-  const { authTag, iv, ciphertext } = decode(value);
-  const decrypted = decrypt(encryptionKey, ciphertext, iv, authTag).toString('utf-8');
-  return `${key}=${decrypted}`;
-};
 
 /**
  * Implements "decrypt" action
@@ -45,11 +37,12 @@ export default function decryptAction(
     process.exit(0);
   }
 
-  const key = deriveKey(password, config.salt);
-  const keyedDecryptor = decrypter(key);
+  const { decryptor } = ignite(password, config.salt);
+
   const changes: [string, string][] = paths.map(path => {
+    const { decryptFile } = getByFilename(path);
     let contents = readFileSync(path, 'utf-8');
-    contents = replaceValues(contents, keyedDecryptor);
+    contents = decryptFile(contents, decryptor);
     return [path.split('.').slice(0, -1).join('.'), contents];
   });
 

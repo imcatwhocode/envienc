@@ -40,6 +40,8 @@
   },
   "dependencies": {
     "commander": "^10.0.0",
-    "glob": "^9.2.1"
+    "glob": "^9.2.1",
+    "peggy": "^3.0.2",
+    "yaml": "^2.3.2"
   }
 }

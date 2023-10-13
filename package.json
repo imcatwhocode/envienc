@@ -21,8 +21,8 @@
     "build": "tsc && node ./scripts/build-shebang.js",
     "build:watch": "tsc --watch",
     "lint": "eslint src tests",
-    "test": "tsc --noEmit && jest --verbose",
-    "test:coverage": "tsc --noEmit && jest --coverage --collectCoverageFrom=src/**/*.ts"
+    "test": "jest --verbose",
+    "test:coverage": "jest --coverage --collectCoverageFrom=src/**/*.ts"
   },
   "devDependencies": {
     "@types/jest": "^29.4.0",

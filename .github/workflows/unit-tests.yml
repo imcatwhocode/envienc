@@ -20,8 +20,8 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Lint
-        run: npm run lint
+      - name: Check compilation and linting errors
+        run: npx tsc --noEmit && npm run lint
 
       - name: Run Tests with Coverage
         run: npm run test:coverage

@@ -1,4 +1,3 @@
-/* eslint-disable */
 const { readFileSync, writeFileSync, chmodSync } = require('fs');
 const { join } = require('path');
 

@@ -1,9 +1,8 @@
 name: Release Workflow
 
 on:
-  push:
-    tags:
-      - "v*"
+  release:
+    types: [created]
 
 jobs:
   release:
@@ -22,7 +21,7 @@ jobs:
 
       - name: Verify Package Version
         run: |
-          tag_version=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
+          tag_version=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///' | sed 's/^v//')
           package_version=$(node -p "require('./package.json').version")
           if [ "$tag_version" != "$package_version" ]; then
             echo "Error: package.json version ($package_version) does not match tag version ($tag_version)"
@@ -31,7 +30,7 @@ jobs:
 
       - name: Verify Package Lock Version
         run: |
-          tag_version=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
+          tag_version=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///' | sed 's/^v//')
           lockfile_version=$(node -p "require('./package-lock.json').version")
           if [ "$tag_version" != "$lockfile_version" ]; then
             echo "Error: package-lock.json version ($lockfile_version) does not match tag version ($tag_version)"

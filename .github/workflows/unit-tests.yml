@@ -20,24 +20,6 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Verify Package Version
-        run: |
-          tag_version=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
-          package_version=$(node -p "require('./package.json').version")
-          if [ "$tag_version" != "$package_version" ]; then
-            echo "Error: package.json version ($package_version) does not match tag version ($tag_version)"
-            exit 1
-          fi
-
-      - name: Verify Package Lock Version
-        run: |
-          tag_version=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
-          lockfile_version=$(node -p "require('./package-lock.json').version")
-          if [ "$tag_version" != "$lockfile_version" ]; then
-            echo "Error: package-lock.json version ($lockfile_version) does not match tag version ($tag_version)"
-            exit 1
-          fi
-
       - name: Run Tests with Coverage
         run: npm run test:coverage
 

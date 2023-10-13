@@ -1,36 +1,38 @@
-import { CipherKey } from 'crypto';
+import { prompt } from 'enquirer';
 import { readFileSync, writeFileSync } from 'fs';
 import { readConfig } from '../config';
-import { decrypt, deriveKey } from '../encryption';
+import { ignite } from '../encryption';
 import { findEncrypted } from '../glob';
+import { getParser } from '../languages';
 import { out, err } from '../output';
-import { Replacer, replaceValues } from '../tokenizer';
-import { decode } from '../encoder';
-
-const decrypter = (encryptionKey: CipherKey): Replacer => (entry, key, value) => {
-  const { authTag, iv, ciphertext } = decode(value);
-  const decrypted = decrypt(encryptionKey, ciphertext, iv, authTag).toString('utf-8');
-  return `${key}=${decrypted}`;
-};
 
 /**
  * Implements "decrypt" action
  * @param opts Arguments
  */
-export default function decryptAction(
+export default async function decryptAction(
   globs: string[],
   { password: passwordArgument, exclude }: { password?: string, exclude?: string },
-): never {
+): Promise<never> {
   const config = readConfig();
-  const password = passwordArgument || process.env.ENVIENC_PWD;
+  let password = passwordArgument || process.env.ENVIENC_PWD;
   if (!config) {
     err('📛 Configuration file is missing. Initialize first with "envienc init"');
     process.exit(1);
   }
 
   if (!password) {
-    err('📛 Password is missing. Provide it via "-p <password>" argument, or "ENVIENC_PWD" environment variable');
-    process.exit(1);
+    try {
+      const input = await prompt<{ password: string }>({ type: 'password', name: 'password', message: '🔑 Encryption password:' });
+      if (!input.password) {
+        throw new Error('Password is missing. Provide it via "-p <password>" argument, "ENVIENC_PWD" environment variable or enter manually on prompt.');
+      }
+
+      password = input.password;
+    } catch (error) {
+      err('📛', error);
+      process.exit(1);
+    }
   }
 
   if (!config.globs?.length && !globs?.length) {
@@ -45,11 +47,12 @@ export default function decryptAction(
     process.exit(0);
   }
 
-  const key = deriveKey(password, config.salt);
-  const keyedDecryptor = decrypter(key);
+  const { decryptor } = ignite(password, config.salt);
+
   const changes: [string, string][] = paths.map(path => {
     let contents = readFileSync(path, 'utf-8');
-    contents = replaceValues(contents, keyedDecryptor);
+    const { decryptFile } = getParser(path, contents);
+    contents = decryptFile(contents, decryptor);
     return [path.split('.').slice(0, -1).join('.'), contents];
   });
 

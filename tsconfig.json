@@ -11,6 +11,7 @@
     "strict": true,
     "skipLibCheck": false,
     "sourceMap": false,
+    "noEmitOnError": true
   },
   "files": ["src/index.ts"]
 }

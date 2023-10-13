@@ -18,7 +18,7 @@ export type Config = {
   salt: string;
 
   /**
-   * Dotenv globs
+   * Files globs
    */
   globs?: string[];
 };
@@ -27,7 +27,7 @@ export type Config = {
  * Recursively find config path recursively up
  *
  * Based on https://github.com/mateodelnorte/find-file-recursively-up
- * @returns Path to .enviencrc, or "undefined" if not found
+ * @returns Path to .enviencrc, or undefined if not found
  */
 export function findConfigPath(): string | undefined {
   function find(entry: string): string | undefined {

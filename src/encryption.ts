@@ -1,79 +1,114 @@
+import { CipherKey } from 'crypto';
 import {
-  CipherGCMTypes, CipherKey, createCipheriv, randomBytes, createDecipheriv, pbkdf2Sync,
-} from 'crypto';
+  decrypt, deriveKey, encrypt, EncryptResult,
+} from './crypto';
+import {
+  Data, GenericMetadata, KeyedDecryptor, KeyedEncryptor,
+} from './types';
 
-export type EncryptResult = {
-  iv: Buffer;
-  authTag: Buffer;
-  ciphertext: Buffer;
+export type Encoded = string;
+export type Decoded = EncryptResult & {
+  format?: FormatNumber
 };
 
 /**
- * Cipher to use.
- * Prefer GCM ciphers for authenticated encryption
+ * Envienc format number
  */
-const CIPHER: CipherGCMTypes = 'aes-256-gcm';
-
-/**
- * Number of KDF iterations
- */
-const KDF_ITERATIONS = 600000;
-
-/**
- * Size of derived key
- */
-const KDF_SIZE = 32;
-
-/**
- * KDF digest
- */
-const KDF_DIGEST = 'sha256';
-
-/**
- * Perform KDF on password to derieve encryption key
- * @param password User-selected password
- * @param salt Salt (must be at least 16 bytes)
- * @returns Encryption key
- */
-export function deriveKey(password: string, salt: string): CipherKey {
-  return pbkdf2Sync(password, salt, KDF_ITERATIONS, KDF_SIZE, KDF_DIGEST);
+export enum FormatNumber {
+  V1 = '',
+  V2 = '$EE2$',
 }
 
 /**
- * Generates salt for KDF
- * @returns Password KDF salt
+ * Encodes encryption result & parameters to safe string
+ * @param params Ciphertext and parameters
+ * @returns Encoded ciphertext
  */
-export function generateSalt(): string {
-  return randomBytes(16).toString('hex');
+function encode(params: Decoded): string {
+  let format = '';
+  if (params.format !== FormatNumber.V1) {
+    // Add version prefix for format v2 and above
+    format = `${params.format ?? FormatNumber.V2}:`;
+  }
+
+  const encoding = params.format === FormatNumber.V1 ? 'hex' : 'base64';
+  return `${format}${params.iv.toString(encoding)}:${params.authTag.toString(encoding)}:${params.ciphertext.toString(encoding)}`;
 }
 
 /**
- * Encrypts data
- * @param key Encryption key
- * @param plaintext Plaintext (unencrypted) data
- * @returns Generated IV and encrypted data
+ * Decodes safe string to encryption result parameters
+ * @param encoded Encoded ciphertext
+ * @returns Ciphertext and parameters
  */
-export function encrypt(key: CipherKey, plaintext: Buffer): EncryptResult {
-  const iv = randomBytes(16);
-  const cipher = createCipheriv(CIPHER, key, iv);
-  const ciphertext = Buffer.concat([cipher.update(plaintext), cipher.final()]);
-  const authTag = cipher.getAuthTag();
+function decode(encoded: Encoded): Decoded {
+  let format: FormatNumber = FormatNumber.V1;
+
+  // Decode parameters
+  const params = encoded
+    .trim()
+    .split(':');
+
+  // Check is first parameter is version number
+  if (params[0] === ('$EE2$')) {
+    params.shift();
+    format = FormatNumber.V2;
+  }
+
+  const encoding = format === FormatNumber.V1 ? 'hex' : 'base64';
+  const [iv, authTag, ciphertext] = params.map(value => Buffer.from(value, encoding));
+  return { iv, authTag, ciphertext };
+}
+
+/**
+ * Encrypts the given data using the provided key and metadata.
+ * @param key The cipher key to use for encryption.
+ * @param data The data to encrypt.
+ * @param metadata The metadata to include in the encrypted data.
+ * @returns The encrypted data as a string.
+ */
+function encryptor(key: CipherKey, data: Data, metadata?: GenericMetadata): string {
+  const plaintext = JSON.stringify({ d: data, m: metadata ?? {} });
+  const encrypted = encrypt(key, Buffer.from(plaintext));
+  return encode(encrypted);
+}
+
+/**
+ * Decrypts an encoded ciphertext using the provided key.
+ * @param key The key used for decryption.
+ * @param encodedCiphertext The encoded ciphertext to be decrypted.
+ * @returns An object containing the decrypted data and metadata.
+ */
+function decryptor(key: CipherKey, encodedCiphertext: string) {
+  const {
+    ciphertext, iv, authTag, format,
+  } = decode(encodedCiphertext);
+
+  const plaintext = decrypt(key, ciphertext, iv, authTag);
+  if (format === FormatNumber.V1) {
+    return { data: plaintext.toString(), metadata: {} };
+  }
+
+  const { d, m } = JSON.parse(plaintext.toString());
   return {
-    iv,
-    authTag,
-    ciphertext,
+    data: d as string,
+    metadata: m as GenericMetadata,
   };
 }
 
 /**
- * Decrypts data
- * @param key Encryption key
- * @param ciphertext Encrypted data
- * @param iv Initialization vector
- * @returns Plaintext (unencrypted) data
+ * Derives encryption key from password and salt, and returns keyed encryptor and decryptor
+ * @param password User-provided password
+ * @param salt Salt
+ * @returns Keyed decryptor and encryptor
  */
-export function decrypt(key: CipherKey, ciphertext: Buffer, iv: Buffer, authTag: Buffer): Buffer {
-  const decipher = createDecipheriv(CIPHER, key, iv);
-  decipher.setAuthTag(authTag);
-  return Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+export function ignite(password: string, salt: string): {
+  encryptor: KeyedEncryptor,
+  decryptor: KeyedDecryptor
+} {
+  const key = deriveKey(password, salt);
+
+  return {
+    encryptor: encryptor.bind(null, key),
+    decryptor: decryptor.bind(null, key),
+  };
 }

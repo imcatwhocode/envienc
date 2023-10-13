@@ -1,3 +1,4 @@
+import { shouldSkip } from '../../flags';
 import { DecryptFile, EncryptFile } from '../../types';
 import {
   EnvTreeNode, parse, stringify, RESERVED_KEYS,
@@ -21,6 +22,10 @@ const encryptFile: EncryptFile = (file, encryptor) => {
       }
 
       const node = value as EnvTreeNode;
+      if (node.comments && shouldSkip(...node.comments)) {
+        return [key, node];
+      }
+
       return [
         key,
         {
@@ -50,6 +55,10 @@ const decryptFile: DecryptFile = (file, decryptor) => {
       }
 
       const node = entry as EnvTreeNode;
+      if (node.comments && shouldSkip(...node.comments)) {
+        return [key, node];
+      }
+
       const { data, metadata } = decryptor(node.value as string);
       const meta = metadata as Metadata;
       return [

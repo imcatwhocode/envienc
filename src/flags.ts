@@ -6,7 +6,7 @@ import { err } from './output';
  * @param comments Comment lines, omitting the leading `#` or other language-specific markers
  * @returns Flags found in the comments
  */
-export default function parseCommentFlags(
+export function parseCommentFlags(
   ...comments: (string | undefined | null)[]
 ): ParserCommentOpts {
   const opts: ParserCommentOpts = {};
@@ -30,4 +30,14 @@ export default function parseCommentFlags(
     });
 
   return opts;
+}
+
+/**
+ * Determines whether to skip a node based on its comments.
+ * @param comments Comments associated with the YAML node.
+ * @returns Whether to skip the YAML node.
+ */
+export function shouldSkip(...comments: (string | undefined | null)[]): boolean {
+  const flags = parseCommentFlags(...comments);
+  return flags.noEncrypt ?? false;
 }

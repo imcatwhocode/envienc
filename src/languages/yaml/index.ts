@@ -1,19 +1,9 @@
 import YAML, {
   isAlias, isCollection, isPair, isScalar, Scalar,
 } from 'yaml';
+import { shouldSkip } from '../../flags';
 import { Data, DecryptFile, EncryptFile } from '../../types';
 import { parse, stringify } from './parser';
-import parseCommentFlags from '../../flags';
-
-/**
- * Determines whether to skip a YAML node based on its comments.
- * @param comments Comments associated with the YAML node.
- * @returns Whether to skip the YAML node.
- */
-const shouldSkip = (...comments: (string | undefined | null)[]): boolean => {
-  const flags = parseCommentFlags(...comments);
-  return flags.noEncrypt ?? false;
-};
 
 /**
  * Traverses a YAML tree and applies a callback to each scalar node.

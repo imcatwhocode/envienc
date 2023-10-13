@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - "v*"
-    branches:
-      - release
 
 jobs:
   release:
@@ -68,7 +66,7 @@ jobs:
           prerelease: false
 
       - name: Publish to NPM
-        uses: js-actions/npm-publish@v2
+        uses: JS-DevTools/npm-publish@v2
         with:
           token: ${{ secrets.NPM_TOKEN }}
           access: "public"

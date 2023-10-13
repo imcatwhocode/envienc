@@ -3,7 +3,7 @@ import { readConfig } from '../config';
 import { ignite } from '../encryption';
 import { EXTENSION, findPlaintext } from '../glob';
 import { out, err } from '../output';
-import getByFilename from '../languages';
+import { getParser } from '../languages';
 
 /**
  * Implements "encrypt" action
@@ -40,8 +40,8 @@ export default function encryptAction(
   const { encryptor } = ignite(password, config.salt);
 
   const changes: [string, string][] = paths.map(path => {
-    const { encryptFile } = getByFilename(path);
     let contents = readFileSync(path, 'utf-8');
+    const { encryptFile } = getParser(path, contents);
     contents = encryptFile(contents, encryptor);
     return [path.concat(EXTENSION), contents];
   });

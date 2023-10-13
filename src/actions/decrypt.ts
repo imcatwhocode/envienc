@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { readConfig } from '../config';
 import { ignite } from '../encryption';
 import { findEncrypted } from '../glob';
-import getByFilename from '../languages';
+import { getParser } from '../languages';
 import { out, err } from '../output';
 
 /**
@@ -40,8 +40,8 @@ export default function decryptAction(
   const { decryptor } = ignite(password, config.salt);
 
   const changes: [string, string][] = paths.map(path => {
-    const { decryptFile } = getByFilename(path);
     let contents = readFileSync(path, 'utf-8');
+    const { decryptFile } = getParser(path, contents);
     contents = decryptFile(contents, decryptor);
     return [path.split('.').slice(0, -1).join('.'), contents];
   });

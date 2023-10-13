@@ -28,7 +28,7 @@ const getParserUsingHeuristics = (name: string, contents: string): Parser => {
   throw new Error(`Could not determine file type: ${name}`);
 };
 
-export default function getParser(name: string, contents: string): Parser {
+export function getParser(name: string, contents: string): Parser {
   // For encrypted files, drop the envienc extension and dive into recursion
   if (name.endsWith('.envienc')) {
     return getParser(name.split('.').slice(0, -1).join('.'), contents);
@@ -44,3 +44,5 @@ export default function getParser(name: string, contents: string): Parser {
 
   return getParserUsingHeuristics(name, contents);
 }
+
+export { getParserUsingHeuristics };

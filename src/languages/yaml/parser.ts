@@ -1,10 +1,15 @@
 import { Document, parseDocument } from 'yaml';
-// import { readFileSync } from 'fs';
 
-// const contents = readFileSync('/Users/imcatwhocode/input.yaml', 'utf8');
-// const body = parseDocument(contents);
+/**
+ * We don't know (and care) about the contents of the file, so we use `any`.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Contents = any;
 
-/*
-const parse = (content: string) => parseDocument<any>(content);
+const parse = (content: string) => parseDocument<Contents>(content);
 
-const stringify = (document: Document.Parsed) => document.toString();
+const stringify = (
+  document: Document.Parsed<Contents, true> | Document<Contents, true>,
+) => document.toString();
+
+export { parse, stringify };

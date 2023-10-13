@@ -7,6 +7,16 @@ export type Parser = {
 };
 
 /**
+ * Additional options retrieved from comments in the file by Parser
+ */
+export type ParserCommentOpts = {
+  /**
+   * Disables encryption of the particular node
+   */
+  noEncrypt?: boolean;
+};
+
+/**
  * Type representing generic metadata object for Envienc v2 format
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

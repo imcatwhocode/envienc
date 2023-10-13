@@ -12,8 +12,8 @@ export function parseCommentFlags(
   const opts: ParserCommentOpts = {};
 
   comments
-    .filter(a => typeof a === 'string' && a.length)
-    .map(a => a.trim())
+    .filter(a => typeof a === 'string' && a.length > 0)
+    .map(a => (a as string).trim())
     .filter(a => a.startsWith('@envienc'))
     .forEach(entry => {
       const ruleset = entry.split(' ').slice(1);

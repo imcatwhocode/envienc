@@ -1,9 +1,8 @@
 name: Release Workflow
 
 on:
-  push:
-    tags:
-      - "v*"
+  release:
+    types: [created]
 
 jobs:
   release:
@@ -22,7 +21,7 @@ jobs:
 
       - name: Verify Package Version
         run: |
-          tag_version=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
+          tag_version=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///' | sed 's/^v//')
           package_version=$(node -p "require('./package.json').version")
           if [ "$tag_version" != "$package_version" ]; then
             echo "Error: package.json version ($package_version) does not match tag version ($tag_version)"
@@ -31,7 +30,7 @@ jobs:
 
       - name: Verify Package Lock Version
         run: |
-          tag_version=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
+          tag_version=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///' | sed 's/^v//')
           lockfile_version=$(node -p "require('./package-lock.json').version")
           if [ "$tag_version" != "$lockfile_version" ]; then
             echo "Error: package-lock.json version ($lockfile_version) does not match tag version ($tag_version)"
@@ -40,30 +39,6 @@ jobs:
 
       - name: Build
         run: npm run build
-
-      - name: Get Previous Release Tag
-        id: get_previous_release_tag
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { data: releases } = await github.repos.listReleases({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              per_page: 1,
-            });
-            return releases[0].tag_name;
-
-      - name: Create Release
-        id: create_release
-        uses: ncipollo/release-action@v1
-        with:
-          name: Release ${{ github.ref }}
-          body: |
-            Changes in this Release:
-            $(git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 ${{ steps.get_previous_release_tag.outputs.result }})..HEAD)
-          draft: false
-          prerelease: false
 
       - name: Publish to NPM
         uses: JS-DevTools/npm-publish@v2

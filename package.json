@@ -1,6 +1,6 @@
 {
   "name": "envienc",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "🔐 Tool for dotenv values encryption",
   "main": "dest/index.js",
   "repository": "https://github.com/imcatwhocode/encenv",

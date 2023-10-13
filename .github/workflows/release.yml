@@ -1,0 +1,59 @@
+name: Release Workflow
+
+on:
+  push:
+    tags:
+      - "v*"
+    branches:
+      - release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18.x"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Get Previous Release Tag
+        id: get_previous_release_tag
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: releases } = await github.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 1,
+            });
+            return releases[0].tag_name;
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release:
+            $(git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 ${{ steps.get_previous_release_tag.outputs.result }})..HEAD)
+          draft: false
+          prerelease: false
+
+      - name: Publish to NPM
+        uses: js-actions/npm-publish@v1.0.0
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          access: "public"

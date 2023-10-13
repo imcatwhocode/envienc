@@ -1,3 +1,5 @@
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://stand-with-ukraine.pp.ua)
+
 # envienc
 
 Envienc is a command-line tool for encrypting dotenv and YAML files, while keeping keys,
@@ -7,7 +9,7 @@ It encrypts only the values, leaving the rest of the file intact.
 
 ## Installation
 
-You need to have Node.js installed on your system. Then, run the following command:
+You need to have Node.js installed on your system. Then, run the following commands:
 
 ```bash
 # Install envienc globally
@@ -42,6 +44,61 @@ npx envienc decrypt
 
 # Help is here anytime you need it
 npx envienc --help
+```
+
+## Exceptions
+
+You can skip specific configuration entries from being encrypted.
+
+Use `@envienc no-encrypt` comment:
+
+## For dotenv
+
+```dotenv
+# @envienc no-encrypt
+PUBLIC_INFO=This variable wouldn't be encrypted
+
+# But this one would
+MY_SECRET=hellokitty
+```
+
+## For YAML
+
+```yaml
+nested:
+  - item1:
+      # Flag below would prevent encryption of entire "item1" entry
+      # @envienc no-encrypt
+      key1: value1
+      key2: value2
+      subitems:
+        - subitem1
+        - subitem2
+  # "item2" will be encrypted as expected
+  - item2:
+      keyA: valueA
+      keyB: valueB
+
+colors:
+  red: "#FF0000"
+  green: "#00FF00"
+  # Flag below would prevent encryption only of "blue" entry
+  blue: "#0000FF" # @envienc no-encrypt
+  random:
+    rgb: [
+        128,
+        # Flag below would prevent encryption only of "255" value
+        255, # @envienc no-encrypt
+        64,
+      ]
+    hex: "#FFFFFF"
+
+# Entire "branding" entry will be kept unencrypted
+# @envienc no-encrypt
+branding:
+  logo_uri: "https://example.com/logo.png"
+  name: "My App"
+  description: "My App is a great app"
 ```
 
 ## Encryption

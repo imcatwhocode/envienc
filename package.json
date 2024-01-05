@@ -1,10 +1,10 @@
 {
   "name": "envienc",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "🔐 Tool for dotenv values encryption",
   "main": "dest/index.js",
-  "repository": "https://github.com/imcatwhocode/encenv",
-  "author": "Dmitry Pepperstein <hi@imcatwhocode.dev>",
+  "repository": "https://github.com/imcatwhocode/envienc",
+  "author": "Dmitry Nourell <hi@imcatwhocode.dev>",
   "license": "MIT",
   "bin": {
     "envienc": "dest/index.js"

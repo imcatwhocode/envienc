@@ -2,8 +2,8 @@ export type EncryptFile = (file: string, encryptor: KeyedEncryptor) => string;
 export type DecryptFile = (file: string, decryptor: KeyedDecryptor) => string;
 
 export type Parser = {
-  encryptFile: EncryptFile,
-  decryptFile: DecryptFile
+  encryptFile: EncryptFile;
+  decryptFile: DecryptFile;
 };
 
 /**
@@ -41,6 +41,6 @@ export type KeyedEncryptor = (data: Data, metadata?: GenericMetadata) => string;
  * @returns Configuration value and metadata
  */
 export type KeyedDecryptor = (encodedCiphertext: string) => {
-  data: Data,
-  metadata: GenericMetadata
+  data: Data;
+  metadata: GenericMetadata;
 };

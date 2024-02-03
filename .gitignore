@@ -38,7 +38,7 @@ yarn-error.log*
 !tests/**/.env
 
 # Build
-dest
+dist
 
 # JetBrains
 .idea/

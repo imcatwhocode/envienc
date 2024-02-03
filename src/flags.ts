@@ -12,12 +12,12 @@ export function parseCommentFlags(
   const opts: ParserCommentOpts = {};
 
   comments
-    .filter(a => typeof a === 'string' && a.length > 0)
-    .map(a => (a as string).trim())
-    .filter(a => a.startsWith('@envienc'))
-    .forEach(entry => {
+    .filter((a) => typeof a === 'string' && a.length > 0)
+    .map((a) => (a as string).trim())
+    .filter((a) => a.startsWith('@envienc'))
+    .forEach((entry) => {
       const ruleset = entry.split(' ').slice(1);
-      ruleset.forEach(rule => {
+      ruleset.forEach((rule) => {
         switch (rule) {
           case 'no-encrypt':
             opts.noEncrypt = true;
@@ -37,7 +37,9 @@ export function parseCommentFlags(
  * @param comments Comments associated with the YAML node.
  * @returns Whether to skip the YAML node.
  */
-export function shouldSkip(...comments: (string | undefined | null)[]): boolean {
+export function shouldSkip(
+  ...comments: (string | undefined | null)[]
+): boolean {
   const flags = parseCommentFlags(...comments);
   return flags.noEncrypt ?? false;
 }

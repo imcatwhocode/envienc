@@ -1,6 +1,4 @@
-import YAML, {
-  isAlias, isCollection, isPair, isScalar, Scalar,
-} from 'yaml';
+import YAML, { isAlias, isCollection, isPair, isScalar, Scalar } from 'yaml';
 import { shouldSkip } from '../../flags';
 import { Data, DecryptFile, EncryptFile } from '../../types';
 import { parse, stringify } from './parser';
@@ -52,7 +50,9 @@ const traverse = (cb: (input: string) => Data, node?: YAML.Node) => {
   if (isCollection(node)) {
     // That's OK to use for-of on this data structure
     // eslint-disable-next-line no-restricted-syntax
-    for (const pair of node.items) { traverse(cb, pair as YAML.Node); }
+    for (const pair of node.items) {
+      traverse(cb, pair as YAML.Node);
+    }
   }
 };
 

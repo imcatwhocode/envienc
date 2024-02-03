@@ -1,5 +1,10 @@
 import {
-  CipherGCMTypes, CipherKey, createCipheriv, randomBytes, createDecipheriv, pbkdf2Sync,
+  CipherGCMTypes,
+  CipherKey,
+  createCipheriv,
+  randomBytes,
+  createDecipheriv,
+  pbkdf2Sync,
 } from 'crypto';
 
 export type EncryptResult = {
@@ -72,7 +77,12 @@ export function encrypt(key: CipherKey, plaintext: Buffer): EncryptResult {
  * @param iv Initialization vector
  * @returns Plaintext (unencrypted) data
  */
-export function decrypt(key: CipherKey, ciphertext: Buffer, iv: Buffer, authTag: Buffer): Buffer {
+export function decrypt(
+  key: CipherKey,
+  ciphertext: Buffer,
+  iv: Buffer,
+  authTag: Buffer,
+): Buffer {
   const decipher = createDecipheriv(CIPHER, key, iv);
   decipher.setAuthTag(authTag);
   return Buffer.concat([decipher.update(ciphertext), decipher.final()]);

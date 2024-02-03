@@ -1,5 +1,5 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { join, resolve } from 'path';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 
 const cwd = process.cwd();
 
@@ -11,7 +11,7 @@ export const CONFIG_NAME = '.enviencrc';
 /**
  * Configuration file
  */
-export type Config = {
+export interface Config {
   /**
    * Password salt
    */
@@ -21,7 +21,7 @@ export type Config = {
    * Files globs
    */
   globs?: string[];
-};
+}
 
 /**
  * Recursively find config path recursively up
@@ -34,8 +34,12 @@ export function findConfigPath(): string | undefined {
     const path = join(cwd, entry, CONFIG_NAME);
     const exists = existsSync(path);
 
-    if (exists) { return path; }
-    if (resolve(cwd, entry) === resolve(cwd, join('..', entry))) { return undefined; }
+    if (exists) {
+      return path;
+    }
+    if (resolve(cwd, entry) === resolve(cwd, join('..', entry))) {
+      return undefined;
+    }
     return find(join('..', entry));
   }
   return find('.');
@@ -47,7 +51,9 @@ export function findConfigPath(): string | undefined {
  */
 export function readConfig(): Config | undefined {
   const path = findConfigPath();
-  if (!path) { return undefined; }
+  if (!path) {
+    return undefined;
+  }
   return JSON.parse(readFileSync(path, 'utf-8'));
 }
 

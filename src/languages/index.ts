@@ -41,9 +41,7 @@ const getParserUsingHeuristics = (name: string, contents: string): Parser => {
 export function getParser(name: string, contents: string): Parser {
   // For encrypted files, drop the envienc extension and dive into recursion
   if (name.endsWith('.envienc')) {
-    return getParser(name.split('.')
-      .slice(0, -1)
-      .join('.'), contents);
+    return getParser(name.split('.').slice(0, -1).join('.'), contents);
   }
 
   if (name.endsWith('.yml') || name.endsWith('.yaml')) {

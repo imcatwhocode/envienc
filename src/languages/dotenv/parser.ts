@@ -22,14 +22,16 @@ export type MultilineMode = 'RESOLVE' | 'ESCAPE';
 export type EnvTreeNode = {
   comments?: string[];
   value: Data;
-  multilineMode?: MultilineMode,
-  followedByNewline: boolean,
+  multilineMode?: MultilineMode;
+  followedByNewline: boolean;
 };
 
 /**
  * Dotenv file tree
  */
-export type EnvTree = Record<string, EnvTreeNode> & { __orphanComments?: string[] };
+export type EnvTree = Record<string, EnvTreeNode> & {
+  __orphanComments?: string[];
+};
 
 /**
  * Parses .env file into a dotenv file tree
@@ -44,9 +46,9 @@ const parse = (content: string): EnvTree => parser.parse(content) as EnvTree;
  * @returns Raw dotenv content
  */
 const stringify = (content: EnvTree): string => {
-  const nodes = Object
-    .entries(content)
-    .filter(([key]) => !RESERVED_KEYS.includes(key)) as [string, EnvTreeNode][];
+  const nodes = Object.entries(content).filter(
+    ([key]) => !RESERVED_KEYS.includes(key),
+  ) as [string, EnvTreeNode][];
 
   const entries = nodes.map(([key, value]) => {
     let entry = '';
@@ -55,7 +57,7 @@ const stringify = (content: EnvTree): string => {
     // Comments
     if (value.comments?.length) {
       // Only add leading "#" to non-empty comments
-      entry += value.comments.map(c => (c.length ? `#${c}` : '')).join('\n');
+      entry += value.comments.map((c) => (c.length ? `#${c}` : '')).join('\n');
       entry += '\n';
     }
 
@@ -90,7 +92,7 @@ const stringify = (content: EnvTree): string => {
   // eslint-disable-next-line no-underscore-dangle
   const orphanComments = content.__orphanComments;
   if (orphanComments?.length) {
-    entries.push(...orphanComments.map(c => (c.length ? `#${c}` : '')));
+    entries.push(...orphanComments.map((c) => (c.length ? `#${c}` : '')));
   }
 
   return entries.join('\n');

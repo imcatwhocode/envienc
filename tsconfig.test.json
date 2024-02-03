@@ -2,6 +2,6 @@
   "extends": "./tsconfig.json",
   "include": ["tests/**/*.ts"],
   "compilerOptions": {
-    "noEmitOnError": false
+    "noEmit": true
   }
 }

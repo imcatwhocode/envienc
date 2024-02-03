@@ -1,14 +1,10 @@
 import { CipherKey } from 'crypto';
-import {
-  decrypt, deriveKey, encrypt, EncryptResult,
-} from './crypto';
-import {
-  Data, GenericMetadata, KeyedDecryptor, KeyedEncryptor,
-} from './types';
+import { decrypt, deriveKey, encrypt, EncryptResult } from './crypto';
+import { Data, GenericMetadata, KeyedDecryptor, KeyedEncryptor } from './types';
 
 export type Encoded = string;
 export type Decoded = EncryptResult & {
-  format?: FormatNumber
+  format?: FormatNumber;
 };
 
 /**
@@ -44,18 +40,18 @@ function decode(encoded: Encoded): Decoded {
   let format: FormatNumber = FormatNumber.V1;
 
   // Decode parameters
-  const params = encoded
-    .trim()
-    .split(':');
+  const params = encoded.trim().split(':');
 
   // Check is first parameter is version number
-  if (params[0] === ('$EE2$')) {
+  if (params[0] === '$EE2$') {
     params.shift();
     format = FormatNumber.V2;
   }
 
   const encoding = format === FormatNumber.V1 ? 'hex' : 'base64';
-  const [iv, authTag, ciphertext] = params.map(value => Buffer.from(value, encoding));
+  const [iv, authTag, ciphertext] = params.map((value) =>
+    Buffer.from(value, encoding),
+  );
   return { iv, authTag, ciphertext };
 }
 
@@ -66,7 +62,11 @@ function decode(encoded: Encoded): Decoded {
  * @param metadata The metadata to include in the encrypted data.
  * @returns The encrypted data as a string.
  */
-function encryptor(key: CipherKey, data: Data, metadata?: GenericMetadata): string {
+function encryptor(
+  key: CipherKey,
+  data: Data,
+  metadata?: GenericMetadata,
+): string {
   const plaintext = JSON.stringify({ d: data, m: metadata ?? {} });
   const encrypted = encrypt(key, Buffer.from(plaintext));
   return encode(encrypted);
@@ -79,9 +79,7 @@ function encryptor(key: CipherKey, data: Data, metadata?: GenericMetadata): stri
  * @returns An object containing the decrypted data and metadata.
  */
 function decryptor(key: CipherKey, encodedCiphertext: string) {
-  const {
-    ciphertext, iv, authTag, format,
-  } = decode(encodedCiphertext);
+  const { ciphertext, iv, authTag, format } = decode(encodedCiphertext);
 
   const plaintext = decrypt(key, ciphertext, iv, authTag);
   if (format === FormatNumber.V1) {
@@ -101,9 +99,12 @@ function decryptor(key: CipherKey, encodedCiphertext: string) {
  * @param salt Salt
  * @returns Keyed decryptor and encryptor
  */
-export function ignite(password: string, salt: string): {
-  encryptor: KeyedEncryptor,
-  decryptor: KeyedDecryptor
+export function ignite(
+  password: string,
+  salt: string,
+): {
+  encryptor: KeyedEncryptor;
+  decryptor: KeyedDecryptor;
 } {
   const key = deriveKey(password, salt);
 

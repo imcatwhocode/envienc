@@ -35,7 +35,7 @@ export function findConfigPath(): string | undefined {
     const exists = existsSync(path);
 
     if (exists) { return path; }
-    if (resolve(cwd, entry) === '/') { return undefined; }
+    if (resolve(cwd, entry) === resolve(cwd, join('..', entry))) { return undefined; }
     return find(join('..', entry));
   }
   return find('.');

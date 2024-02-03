@@ -1,4 +1,4 @@
-import {Parser} from '../types';
+import { Parser } from '../types';
 import dotenv from './dotenv';
 import yaml from './yaml';
 import cPreprocessor from './c-preprocessor';
@@ -42,8 +42,8 @@ export function getParser(name: string, contents: string): Parser {
   // For encrypted files, drop the envienc extension and dive into recursion
   if (name.endsWith('.envienc')) {
     return getParser(name.split('.')
-        .slice(0, -1)
-        .join('.'), contents);
+      .slice(0, -1)
+      .join('.'), contents);
   }
 
   if (name.endsWith('.yml') || name.endsWith('.yaml')) {
@@ -61,4 +61,4 @@ export function getParser(name: string, contents: string): Parser {
   return getParserUsingHeuristics(name, contents);
 }
 
-export {getParserUsingHeuristics};
+export { getParserUsingHeuristics };

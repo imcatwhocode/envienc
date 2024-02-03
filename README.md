@@ -2,7 +2,7 @@
 
 # envienc
 
-Envienc is a command-line tool for encrypting dotenv and YAML files, while keeping keys,
+Envienc is a command-line tool for encrypting dotenv, YAML and .h/.hpp files, while keeping keys,
 comments, and overall structure untouched.
 
 It encrypts only the values, leaving the rest of the file intact.
@@ -99,6 +99,15 @@ branding:
   logo_uri: "https://example.com/logo.png"
   name: "My App"
   description: "My App is a great app"
+```
+
+## For .H/.HPP
+```c
+// Will be encrypted
+#define SECURE_STUFF "my_sweetest_secret"
+
+// Will not be encrypted
+#define NON_SECURE_STUFF /* @envienc no-encrypt */ "not_secret_at_all"
 ```
 
 ## Encryption

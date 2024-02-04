@@ -1,6 +1,6 @@
 import { generate } from 'peggy';
-import { Data } from '../../types';
-import grammar from './grammar';
+import type { Data } from '../../types';
+import { grammar } from './grammar';
 
 const parser = generate(grammar);
 
@@ -19,36 +19,34 @@ export type MultilineMode = 'RESOLVE' | 'ESCAPE';
 /**
  * Dotenv file tree node
  */
-export type EnvTreeNode = {
+export interface EnvTreeNode {
   comments?: string[];
   value: Data;
   multilineMode?: MultilineMode;
   followedByNewline: boolean;
-};
+}
 
 /**
  * Dotenv file tree
  */
-export type EnvTree = Record<string, EnvTreeNode> & {
-  __orphanComments?: string[];
-};
+export type EnvTree = Record<string, EnvTreeNode>;
 
 /**
  * Parses .env file into a dotenv file tree
- * @param content Raw dotenv content
+ * @param content - Raw dotenv content
  * @returns Dotenv tree
  */
 const parse = (content: string): EnvTree => parser.parse(content) as EnvTree;
 
 /**
  * Stringifies a Dotenv tree into a .env file contents
- * @param content Dotenv file tree
+ * @param content - Dotenv file tree
  * @returns Raw dotenv content
  */
 const stringify = (content: EnvTree): string => {
   const nodes = Object.entries(content).filter(
     ([key]) => !RESERVED_KEYS.includes(key),
-  ) as [string, EnvTreeNode][];
+  );
 
   const entries = nodes.map(([key, value]) => {
     let entry = '';
@@ -62,7 +60,7 @@ const stringify = (content: EnvTree): string => {
     }
 
     // Key
-    entry += `${key}`;
+    entry += key;
 
     // Flag value
     if (value.value === true) {
@@ -89,8 +87,7 @@ const stringify = (content: EnvTree): string => {
   });
 
   // Apply orphan comments
-  // eslint-disable-next-line no-underscore-dangle
-  const orphanComments = content.__orphanComments;
+  const orphanComments = content.__orphanComments?.comments;
   if (orphanComments?.length) {
     entries.push(...orphanComments.map((c) => (c.length ? `#${c}` : '')));
   }

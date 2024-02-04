@@ -1,26 +1,31 @@
-import { DecryptFile, EncryptFile } from '../../types';
+import type { DecryptFile, EncryptFile } from '../../types';
 
 const DEFINE_REGEX =
-  /^(\s*#define\s+\S+\s+)((?:\/\*\s+@envienc\s+no-encrypt\s+\*\/\s+)?)((?:.*?\\(\n|\r\n))*.*?)$/gm;
+  /^(?<define>\s*#define\s+\S+\s+)(?<comment>(?:\/\*\s+@envienc\s+no-encrypt\s+\*\/\s+)?)(?<content>(?:.*?\\(?<line>\n|\r\n))*.*?)$/gm;
 
-const ENCRYPTED_DEFINE_REGEX = /^(\s*#define\s+\S+\s+)("\$EE2\$.*?")$/gm;
+const ENCRYPTED_DEFINE_REGEX =
+  /^(?<define>\s*#define\s+\S+\s+)(?<ciphertext>"\$EE2\$.*?")$/gm;
 
-const encryptFile: EncryptFile = (file, encryptor) =>
-  file.replace(DEFINE_REGEX, (match, prefixGroup, disableGroup, dataGroup) => {
-    if (disableGroup !== '') {
-      return match;
-    }
-    return `${prefixGroup}${JSON.stringify(encryptor(dataGroup))}`;
-  });
-
-const decryptFile: DecryptFile = (file, decryptor) =>
+export const encryptFile: EncryptFile = (file, encryptor) =>
   file.replace(
-    ENCRYPTED_DEFINE_REGEX,
-    (match, prefixGroup, dataGroup) =>
-      `${prefixGroup}${decryptor(JSON.parse(dataGroup)).data}`,
+    DEFINE_REGEX,
+    (match, prefixGroup: string, disableGroup: string, dataGroup: string) => {
+      if (disableGroup !== '') {
+        return match;
+      }
+      return `${prefixGroup}${JSON.stringify(encryptor(dataGroup))}`;
+    },
   );
 
-export default {
-  encryptFile,
-  decryptFile,
-};
+export const decryptFile: DecryptFile = (file, decryptor) =>
+  file.replace(
+    ENCRYPTED_DEFINE_REGEX,
+    (_, prefixGroup: string, dataGroup: string) => {
+      const unarmored = JSON.parse(dataGroup) as unknown;
+      if (typeof unarmored !== 'string') {
+        throw new Error('Invalid ciphertext');
+      }
+
+      return `${prefixGroup}${decryptor(unarmored).data}`;
+    },
+  );

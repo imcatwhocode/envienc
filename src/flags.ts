@@ -1,9 +1,9 @@
-import { ParserCommentOpts } from './types';
-import { err } from './output';
+import type { ParserCommentOpts } from './types';
+import { logger } from './output';
 
 /**
  * Parses comments with envienc flags
- * @param comments Comment lines, omitting the leading `#` or other language-specific markers
+ * @param comments - Comment lines, omitting the leading `#` or other language-specific markers
  * @returns Flags found in the comments
  */
 export function parseCommentFlags(
@@ -12,8 +12,8 @@ export function parseCommentFlags(
   const opts: ParserCommentOpts = {};
 
   comments
-    .filter((a) => typeof a === 'string' && a.length > 0)
-    .map((a) => (a as string).trim())
+    .filter((a): a is string => typeof a === 'string' && a.length > 0)
+    .map((a) => a.trim())
     .filter((a) => a.startsWith('@envienc'))
     .forEach((entry) => {
       const ruleset = entry.split(' ').slice(1);
@@ -23,7 +23,7 @@ export function parseCommentFlags(
             opts.noEncrypt = true;
             break;
           default:
-            err('⚠️ Found unsupported comment flag:', rule);
+            logger.error('Found unsupported comment flag:', rule);
             break;
         }
       });
@@ -34,7 +34,7 @@ export function parseCommentFlags(
 
 /**
  * Determines whether to skip a node based on its comments.
- * @param comments Comments associated with the YAML node.
+ * @param comments - Comments associated with the YAML node.
  * @returns Whether to skip the YAML node.
  */
 export function shouldSkip(

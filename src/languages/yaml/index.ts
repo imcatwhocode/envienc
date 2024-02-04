@@ -1,14 +1,15 @@
-import YAML, { isAlias, isCollection, isPair, isScalar, Scalar } from 'yaml';
+import type YAML from 'yaml';
+import { isAlias, isCollection, isPair, isScalar } from 'yaml';
 import { shouldSkip } from '../../flags';
-import { Data, DecryptFile, EncryptFile } from '../../types';
+import type { Data, DecryptFile, EncryptFile } from '../../types';
 import { parse, stringify } from './parser';
 
 /**
  * Traverses a YAML tree and applies a callback to each scalar node.
- * @param cb The callback to apply to each scalar node.
- * @param node The YAML node to traverse.
+ * @param cb - The callback to apply to each scalar node.
+ * @param node - The YAML node to traverse.
  */
-const traverse = (cb: (input: string) => Data, node?: YAML.Node) => {
+const traverse = (cb: (input: string) => Data, node?: YAML.Node): void => {
   // Skip empty nodes
   if (!node) {
     return;
@@ -28,8 +29,8 @@ const traverse = (cb: (input: string) => Data, node?: YAML.Node) => {
   // Encrypt scalars
   if (isScalar(node)) {
     // Reassigning the value is the intended way to mutate the tree
-    // eslint-disable-next-line no-param-reassign
-    (node as Scalar).value = cb(node.value as string);
+
+    node.value = cb(node.value as string);
     return;
   }
 
@@ -49,7 +50,7 @@ const traverse = (cb: (input: string) => Data, node?: YAML.Node) => {
   // Traverse into Collections' items
   if (isCollection(node)) {
     // That's OK to use for-of on this data structure
-    // eslint-disable-next-line no-restricted-syntax
+
     for (const pair of node.items) {
       traverse(cb, pair as YAML.Node);
     }
@@ -58,16 +59,25 @@ const traverse = (cb: (input: string) => Data, node?: YAML.Node) => {
 
 const encryptFile: EncryptFile = (file, encryptor) => {
   const tree = parse(file);
-  traverse(encryptor, tree.contents);
+  if (!tree.contents) {
+    return stringify(tree);
+  }
+
+  traverse(encryptor, tree.contents as YAML.Node);
   return stringify(tree);
 };
 
 const decryptFile: DecryptFile = (file, decryptor) => {
   const tree = parse(file);
-  const decrypt = (input: string) => decryptor(input).data;
+  if (!tree.contents) {
+    return stringify(tree);
+  }
 
-  traverse(decrypt, tree.contents);
+  traverse(
+    (input: string) => decryptor(input).data,
+    tree.contents as YAML.Node,
+  );
   return stringify(tree);
 };
 
-export default { encryptFile, decryptFile };
+export { encryptFile, decryptFile };

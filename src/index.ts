@@ -1,7 +1,7 @@
 import { program } from 'commander';
-import initAction from './actions/init';
-import encryptAction from './actions/encrypt';
-import decryptAction from './actions/decrypt';
+import { initAction } from './actions/init';
+import { encryptAction } from './actions/encrypt';
+import { decryptAction } from './actions/decrypt';
 
 program
   .name('envienc')

@@ -7,6 +7,7 @@
     "target": "es2022",
     "outDir": "dist",
     "rootDir": "src",
+    "declaration": true,
   },
   "files": ["src/index.ts"],
 }

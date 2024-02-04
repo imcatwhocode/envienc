@@ -1,16 +1,16 @@
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { prompt } from 'enquirer';
 import { readConfig } from '../config';
 import { ignite } from '../encryption';
 import { EXTENSION, findPlaintext } from '../glob';
-import { out, err } from '../output';
+import { logger } from '../output';
 import { getParser } from '../languages';
 
 /**
  * Implements "encrypt" action
- * @param opts Arguments
+ * @param opts - Arguments
  */
-export default async function encryptAction(
+export async function encryptAction(
   globs: string[],
   {
     password: passwordArgument,
@@ -20,8 +20,8 @@ export default async function encryptAction(
   const config = readConfig();
   let password = passwordArgument || process.env.ENVIENC_PWD;
   if (!config) {
-    err(
-      '📛 Configuration file is missing. Initialize first with "envienc init"',
+    logger.error(
+      'Configuration file is missing. Initialize first with "envienc init"',
     );
     process.exit(1);
   }
@@ -41,20 +41,24 @@ export default async function encryptAction(
 
       password = input.password;
     } catch (error) {
-      err('📛', error);
+      logger.error(error);
       process.exit(1);
     }
   }
 
-  if (!config.globs?.length && !globs?.length) {
-    out('⚠️  Nothing to encrypt. Skipping...');
+  if (!config.globs?.length && !globs.length) {
+    logger.info('Nothing to encrypt. Skipping...');
     process.exit(0);
   }
 
-  const patterns = [...(config.globs || []), ...(globs || [])];
+  const patterns = [...globs];
+  if (config.globs?.length) {
+    patterns.push(...config.globs);
+  }
+
   const paths = findPlaintext(patterns, { ignore: exclude });
   if (!paths.length) {
-    out('⚠️  Nothing to encrypt. Skipping...');
+    logger.info('Nothing to encrypt. Skipping...');
     process.exit(0);
   }
 
@@ -69,9 +73,9 @@ export default async function encryptAction(
 
   changes.forEach(([path, contents]) => {
     writeFileSync(path, contents, 'utf-8');
-    out('✔️  Encrypted:', path);
+    logger.info('✔️  Encrypted:', path);
   });
 
-  out('🎉 Done!');
+  logger.info('🎉 Done!');
   process.exit(0);
 }

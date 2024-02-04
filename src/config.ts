@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { z } from 'zod';
 
 const cwd = process.cwd();
 
@@ -8,20 +9,18 @@ const cwd = process.cwd();
  */
 export const CONFIG_NAME = '.enviencrc';
 
-/**
- * Configuration file
- */
-export interface Config {
+const Config = z.object({
   /**
-   * Password salt
+   * Salt for key derivation from password
    */
-  salt: string;
-
+  salt: z.string(),
   /**
    * Files globs
    */
-  globs?: string[];
-}
+  globs: z.array(z.string()).optional(),
+});
+
+type Config = z.infer<typeof Config>;
 
 /**
  * Recursively find config path recursively up
@@ -54,12 +53,18 @@ export function readConfig(): Config | undefined {
   if (!path) {
     return undefined;
   }
-  return JSON.parse(readFileSync(path, 'utf-8'));
+
+  const contents = JSON.parse(readFileSync(path, 'utf-8')) as unknown;
+  if (!contents) {
+    return undefined;
+  }
+
+  return Config.parse(contents);
 }
 
 /**
  * Writes configuration to file in current location
- * @param config Configuration file contents
+ * @param config - Configuration file contents
  * @returns Path to created configuration file
  */
 export function writeConfig(config: Config): string {

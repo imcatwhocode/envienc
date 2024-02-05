@@ -10,6 +10,7 @@
 ## Reporting a Vulnerability
 
 Please reach me via email + PGP using public key below. Email address is embedded into the public key:
+
 ```
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 

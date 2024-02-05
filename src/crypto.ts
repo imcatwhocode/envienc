@@ -1,12 +1,30 @@
+import type { CipherGCMTypes, CipherKey } from 'node:crypto';
 import {
-  CipherGCMTypes, CipherKey, createCipheriv, randomBytes, createDecipheriv, pbkdf2Sync,
-} from 'crypto';
+  createCipheriv,
+  randomBytes,
+  createDecipheriv,
+  pbkdf2Sync,
+} from 'node:crypto';
+import { z } from 'zod';
 
-export type EncryptResult = {
-  iv: Buffer;
-  authTag: Buffer;
-  ciphertext: Buffer;
-};
+export const EncryptResult = z.object({
+  /**
+   * Initialization vector
+   */
+  iv: z.instanceof(Buffer),
+
+  /**
+   * AEAD authentication tag
+   */
+  authTag: z.instanceof(Buffer),
+
+  /**
+   * Encrypted data
+   */
+  ciphertext: z.instanceof(Buffer),
+});
+
+export type EncryptResult = z.infer<typeof EncryptResult>;
 
 /**
  * Cipher to use.
@@ -39,8 +57,8 @@ export function generateSalt(): string {
 
 /**
  * Perform KDF on password to derieve encryption key
- * @param password User-selected password
- * @param salt Salt (must be at least 16 bytes)
+ * @param password - User-selected password
+ * @param salt - Salt (must be at least 16 bytes)
  * @returns Encryption key
  */
 export function deriveKey(password: string, salt: string): CipherKey {
@@ -49,8 +67,8 @@ export function deriveKey(password: string, salt: string): CipherKey {
 
 /**
  * Encrypts data
- * @param key Encryption key
- * @param plaintext Plaintext (unencrypted) data
+ * @param key - Encryption key
+ * @param plaintext - Plaintext (unencrypted) data
  * @returns Generated IV and encrypted data
  */
 export function encrypt(key: CipherKey, plaintext: Buffer): EncryptResult {
@@ -67,12 +85,17 @@ export function encrypt(key: CipherKey, plaintext: Buffer): EncryptResult {
 
 /**
  * Decrypts data
- * @param key Encryption key
- * @param ciphertext Encrypted data
- * @param iv Initialization vector
+ * @param key - Encryption key
+ * @param ciphertext - Encrypted data
+ * @param iv - Initialization vector
  * @returns Plaintext (unencrypted) data
  */
-export function decrypt(key: CipherKey, ciphertext: Buffer, iv: Buffer, authTag: Buffer): Buffer {
+export function decrypt(
+  key: CipherKey,
+  ciphertext: Buffer,
+  iv: Buffer,
+  authTag: Buffer,
+): Buffer {
   const decipher = createDecipheriv(CIPHER, key, iv);
   decipher.setAuthTag(authTag);
   return Buffer.concat([decipher.update(ciphertext), decipher.final()]);

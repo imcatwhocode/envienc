@@ -1,16 +1,16 @@
 import { writeConfig } from '../config';
 import { generateSalt } from '../crypto';
-import { out } from '../output';
+import { logger } from '../output';
 
 /**
  * Implements "init" action
- * @param opts Arguments
+ * @param opts - Arguments
  */
-export default function initAction({ glob }: { glob?: string[] }): never {
+export function initAction({ glob }: { glob?: string[] }): never {
   const path = writeConfig({
     salt: generateSalt(),
     globs: glob,
   });
-  out('✌️ Created configuration:', path);
+  logger.info('✌️ Created configuration:', path);
   process.exit(0);
 }

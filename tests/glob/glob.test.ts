@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join } from 'node:path';
 import { findPlaintext, findEncrypted } from '../../src/glob';
 
 test('enumerates plaintext .env in directory', () => {

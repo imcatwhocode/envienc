@@ -1,15 +1,16 @@
-import { Document, parseDocument } from 'yaml';
+import type { Document } from 'yaml';
+import { parseDocument } from 'yaml';
 
-/**
- * We don't know (and care) about the contents of the file, so we use `any`.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any -- we don't know input file structure, and don't really care about it */
 export type Contents = any;
 
-const parse = (content: string) => parseDocument<Contents>(content);
+const parse = (
+  content: string,
+): Document.Parsed<Contents> | Document<Contents> =>
+  parseDocument<Contents>(content);
 
 const stringify = (
-  document: Document.Parsed<Contents, true> | Document<Contents, true>,
-) => document.toString();
+  document: Document.Parsed<Contents> | Document<Contents>,
+): string => document.toString();
 
 export { parse, stringify };

@@ -1,5 +1,3 @@
-[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://stand-with-ukraine.pp.ua)
-
 # envienc
 
 Envienc is a command-line tool for encrypting dotenv, YAML and .h/.hpp files, while keeping keys,
@@ -80,10 +78,10 @@ nested:
       keyB: valueB
 
 colors:
-  red: "#FF0000"
-  green: "#00FF00"
+  red: '#FF0000'
+  green: '#00FF00'
   # Flag below would prevent encryption only of "blue" entry
-  blue: "#0000FF" # @envienc no-encrypt
+  blue: '#0000FF' # @envienc no-encrypt
   random:
     rgb: [
         128,
@@ -91,17 +89,18 @@ colors:
         255, # @envienc no-encrypt
         64,
       ]
-    hex: "#FFFFFF"
+    hex: '#FFFFFF'
 
 # Entire "branding" entry will be kept unencrypted
 # @envienc no-encrypt
 branding:
-  logo_uri: "https://example.com/logo.png"
-  name: "My App"
-  description: "My App is a great app"
+  logo_uri: 'https://example.com/logo.png'
+  name: 'My App'
+  description: 'My App is a great app'
 ```
 
 ## For .H/.HPP
+
 ```c
 // Will be encrypted
 #define SECURE_STUFF "my_sweetest_secret"

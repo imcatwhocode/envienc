@@ -1,4 +1,4 @@
-const grammar = `
+export const grammar = `
 Lines
   = lines:(Line / CommentLine / EmptyLine)* {
       let result = lines.reduce((acc, item) => {
@@ -23,7 +23,11 @@ Lines
       
       // Assign remaining _tempComments to __orphanComments
       if (result._tempComments) {
-        result.__orphanComments = result._tempComments;
+        result.__orphanComments = {
+          comments: result._tempComments,
+          value: '',
+          followedByNewline: false,
+        };
         delete result._tempComments;
       }
       
@@ -67,5 +71,3 @@ MultiLineValue
 _ "whitespace"
   = [ \\t\\r]* 
 `;
-
-export default grammar;

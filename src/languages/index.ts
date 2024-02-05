@@ -1,7 +1,7 @@
-import { Parser } from '../types';
-import dotenv from './dotenv';
-import yaml from './yaml';
-import cPreprocessor from './c-preprocessor';
+import type { Parser } from '../types';
+import * as dotenv from './dotenv';
+import * as yaml from './yaml';
+import * as cPreprocessor from './c-preprocessor';
 
 /**
  * Simple heuristic to determine if a file is YAML-like.
@@ -20,10 +20,10 @@ const DOTENV_LIKE_REGEX = /^[A-Z_]+=.+$/gm;
 /**
  * Simple heuristic to determine if a file is a c-preprocessor-like file
  */
-const C_PREPROCESSOR_LIKE_REGEX = /^(\s*)#define/gm;
+const C_PREPROCESSOR_LIKE_REGEX = /^(?<define>\s*)#define/gm;
 
 const getParserUsingHeuristics = (name: string, contents: string): Parser => {
-  if (contents.match(YAML_LIKE_REGEX)) {
+  if (YAML_LIKE_REGEX.exec(contents)) {
     return yaml;
   }
 
@@ -41,9 +41,7 @@ const getParserUsingHeuristics = (name: string, contents: string): Parser => {
 export function getParser(name: string, contents: string): Parser {
   // For encrypted files, drop the envienc extension and dive into recursion
   if (name.endsWith('.envienc')) {
-    return getParser(name.split('.')
-      .slice(0, -1)
-      .join('.'), contents);
+    return getParser(name.split('.').slice(0, -1).join('.'), contents);
   }
 
   if (name.endsWith('.yml') || name.endsWith('.yaml')) {

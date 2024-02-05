@@ -73,9 +73,9 @@ export async function decryptAction(
 
   changes.forEach(([path, contents]) => {
     writeFileSync(path, contents, 'utf-8');
-    logger.info('✔️ Decrypted:', path);
+    logger.info('Decrypted:', path);
   });
 
-  logger.info('🎉 Done!');
+  logger.info('Done!');
   process.exit(0);
 }

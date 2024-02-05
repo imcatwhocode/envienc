@@ -73,9 +73,9 @@ export async function encryptAction(
 
   changes.forEach(([path, contents]) => {
     writeFileSync(path, contents, 'utf-8');
-    logger.info('✔️  Encrypted:', path);
+    logger.info('Encrypted: %s', path);
   });
 
-  logger.info('🎉 Done!');
+  logger.info('Done!');
   process.exit(0);
 }

@@ -1,5 +1,3 @@
-[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://stand-with-ukraine.pp.ua)
-
 # envienc
 
 Envienc is a command-line tool for encrypting dotenv, YAML and .h/.hpp files, while keeping keys,

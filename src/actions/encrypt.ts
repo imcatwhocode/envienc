@@ -18,7 +18,8 @@ export async function encryptAction(
   }: { password?: string; exclude?: string },
 ): Promise<never> {
   const config = readConfig();
-  let password = passwordArgument || process.env.ENVIENC_PWD;
+  let password =
+    passwordArgument ?? process.env.ENVIENC_PASSWORD ?? process.env.ENVIENC_PWD;
   if (!config) {
     logger.error(
       'Configuration file is missing. Initialize first with "envienc init"',
@@ -35,7 +36,7 @@ export async function encryptAction(
       });
       if (!input.password) {
         throw new Error(
-          'Password is missing. Provide it via "-p <password>" argument, "ENVIENC_PWD" environment variable or enter manually on prompt.',
+          'Password is missing. Provide it via "-p <password>" argument, "ENVIENC_PASSWORD" environment variable or enter manually on prompt.',
         );
       }
 

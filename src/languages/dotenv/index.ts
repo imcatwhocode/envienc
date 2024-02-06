@@ -32,7 +32,7 @@ const encryptFile: EncryptFile = (file, encryptor) => {
           value: encryptor(node.value, {
             multilineMode: node.multilineMode,
             followedByNewline: node.followedByNewline,
-          }),
+          }) as string,
         },
       ];
     },
@@ -63,7 +63,7 @@ const decryptFile: DecryptFile = (file, decryptor) => {
         key,
         {
           ...node,
-          value: data,
+          value: data as string,
           // Fallback to "ESCAPE" mode if not specified
           multilineMode: meta.multilineMode ?? 'ESCAPE',
           followedByNewline: meta.followedByNewline ?? false,

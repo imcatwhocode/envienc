@@ -28,7 +28,7 @@ export const EmbeddedDecryptResult = z.object({
   /**
    * Plaintext data
    */
-  d: z.string(),
+  d: z.unknown(),
 
   /**
    * Optional serializable metadata
@@ -108,7 +108,7 @@ function encryptor(
 function decryptor(
   key: CipherKey,
   encodedCiphertext: string,
-): { data: string; metadata: GenericMetadata } {
+): { data: unknown; metadata: GenericMetadata } {
   const { ciphertext, iv, authTag, format } = decode(encodedCiphertext);
 
   const plaintext = decrypt(key, ciphertext, iv, authTag);

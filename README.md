@@ -123,5 +123,5 @@ Under the hood, envienc uses the AES-256-GCM algorithm to encrypt the values.
 You can provide the password in several ways. The order of precedence is as follows:
 
 1. Using the `--password` option. Please, don't ever do this in production.
-2. Using the `ENVIENC_PWD` environment variable.
+2. Using the `ENVIENC_PASSWORD` environment variable.
 3. Using the interactive prompt when encrypting or decrypting.

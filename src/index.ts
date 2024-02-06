@@ -3,6 +3,12 @@ import { initAction } from './actions/init';
 import { encryptAction } from './actions/encrypt';
 import { decryptAction } from './actions/decrypt';
 
+if (process.env.ENVIENC_PWD) {
+  process.stderr.write(
+    '🚨 Warning: "ENVIENC_PWD" environment variable is deprecated and will be removed in future versions.\n🚨 Use "ENVIENC_PASSWORD" instead.\n\n',
+  );
+}
+
 program
   .name('envienc')
   .description(
@@ -26,7 +32,7 @@ program
   )
   .option(
     '-p, --password <password>',
-    'Encryption password. Alternatively can be supplied via "ENVIENC_PWD" environment variable',
+    'Encryption password. Alternatively can be supplied via "ENVIENC_PASSWORD" environment variable',
   )
   .option(
     '-e, --exclude [glob]',
@@ -43,7 +49,7 @@ program
   )
   .option(
     '-p, --password <password>',
-    'Encryption password. Alternatively can be supplied via "ENVIENC_PWD" environment variable',
+    'Encryption password. Alternatively can be supplied via "ENVIENC_PASSWORD" environment variable',
   )
   .option(
     '-e, --exclude [glob]',

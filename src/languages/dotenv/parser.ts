@@ -21,7 +21,7 @@ export type MultilineMode = 'RESOLVE' | 'ESCAPE';
  */
 export interface EnvTreeNode {
   comments?: string[];
-  value: Data;
+  value: string | true;
   multilineMode?: MultilineMode;
   followedByNewline: boolean;
 }

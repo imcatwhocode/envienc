@@ -24,7 +24,7 @@ export type GenericMetadata = Record<string, unknown>;
 /**
  * Type representing generic data entry
  */
-export type Data = string | true;
+export type Data = unknown;
 
 /**
  * Encrypts data and metadata
@@ -32,7 +32,7 @@ export type Data = string | true;
  * @param metadata - Metadata related to this value
  * @returns Encrypted & encoded string
  */
-export type KeyedEncryptor = (data: Data, metadata?: GenericMetadata) => string;
+export type KeyedEncryptor = (data: Data, metadata?: GenericMetadata) => Data;
 
 /**
  * Decrypts data and metadata

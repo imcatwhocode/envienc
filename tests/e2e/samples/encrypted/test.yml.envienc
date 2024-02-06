@@ -1,0 +1,35 @@
+# Scalar nodes
+string: '$EE2$:n7Y4Qyu+X7CBdsKoCC8RgA==:mK7cHEzQ2pV1qjL0Zt0oww==:rP1N8koSC6lkCUYCwBmRKQ1+l5ZH+J24Bws='
+number: $EE2$:4MnO46UKQi+BnwUvx2anAw==:AcrlK7/9faHCNRQRKIrVGg==:grABk9ZHmgEFQMCqLpo6
+boolean: $EE2$:aFdgZ8TM9JNcml64JpKEkw==:T0a/Lhe7te7ROyXwgK0eZQ==:L3G7c1dpNetWa+uUqSp4NHQ=
+null: $EE2$:9S3CDeuXFLHVdpyy8RtXRw==:cZ6W19B+1i2gaEK5fFLWhw==:8qihFVGJO5jACPFGZpkESDk=
+
+# Sequence node
+sequence:
+  # @envienc no-encrypt
+  - item1
+  - item2
+  - item3
+
+# Mapping node
+mapping:
+  key1: $EE2$:y3R0Tun+tDA7FgYsU6Ukfw==:6wVwknBb6YfpKHA/Y1FGfQ==:PWJxLISmjjIIK8VDYiUTx16Z5dxIyQZpL94=
+  key2: value2 # @envienc no-encrypt
+  key3: $EE2$:ug0TptMUzChFBJpj/k5F6A==:UUGNXpMYWXp4OOVr6jdAAQ==:yWb+79KLjoDvn6Kdz72oHjuGKscbWHg5xjPe8WCrI0AE4wE=
+
+# Anchors and aliases
+anchored_sequence:
+  # @envienc no-encrypt
+  &seq
+  - item1
+  - item2
+  - item3
+
+aliased_sequence: *seq
+
+anchored_mapping: &map
+  key1: $EE2$:5zhJvoYiHrwbLN7/D42kVQ==:J1TboTbtfcchKZEktvPh2g==:aywvaON5QRB12obUJD45xWbKRh0k
+  key2: $EE2$:xnLoIjCdVMUlShdqr7WmCw==:fLNne2eCIz/iWrmDAeIc0Q==:5u28Gxe/RcIuj5WA5UG/QexPJAD7LfV/P5YxUES7/g==
+  key3: $EE2$:2LOR+246s5gBeF4RA48xPA==:d6pedXLc0l8Q73YAgUaU6A==:NAiWq0RcHrV9ZDPpZZS7lUpAxGUKzfAXMBSwMMFevVwA
+
+aliased_mapping: *map

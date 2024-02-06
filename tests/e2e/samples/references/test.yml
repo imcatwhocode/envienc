@@ -1,0 +1,35 @@
+# Scalar nodes
+string: 'SECRETVALUE'
+number: 42
+boolean: true
+null: null
+
+# Sequence node
+sequence:
+  # @envienc no-encrypt
+  - item1
+  - item2
+  - item3
+
+# Mapping node
+mapping:
+  key1: SECRETVALUE
+  key2: value2 # @envienc no-encrypt
+  key3: ANOTHER_SECRET_VALUE
+
+# Anchors and aliases
+anchored_sequence:
+  # @envienc no-encrypt
+  &seq
+  - item1
+  - item2
+  - item3
+
+aliased_sequence: *seq
+
+anchored_mapping: &map
+  key1: SECRET
+  key2: YETANOTHERSECRET
+  key3: OHWOWANOTHERSECRET
+
+aliased_mapping: *map

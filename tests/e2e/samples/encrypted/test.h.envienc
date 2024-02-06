@@ -1,0 +1,9 @@
+#ifdef MEOW
+  #define TEST "$EE2$:QYqGB2LWiZzS0hjSaLbFqg==:UEaOplCrYXN6aXuznPrZVw==:OeyB3uy+DMMLRRSDu59WdewPUQnY83naVp9n+7e792VB9aZijoJjM0fQfX8f5YDj+++z7rYV8ilaMhU="
+  #define TEST_ML "$EE2$:m8h2ilQkYRuEEfV1uV/uAQ==:DoA0dDnnojeswZtkMe5cow==:AheX6GjfT9FJsx1tZPGtg7m2BkuM+DNXieNPpGIlMpDwcuMuR9UjvwaP08vB+YKix1OTTHAG6Qj+bT7mJYB0EEhja5YDFbJeVOXI7wha7DyPiAqhrdySCRcmNWSwzTnwDrA="
+
+  #define UNSEC /* @envienc no-encrypt */ "Plaintext stuff"
+  #define UNSEC_ML /* @envienc no-encrypt */ "This content will be kept" \
+    "...and this" \
+    "...surely this one too"
+#endif

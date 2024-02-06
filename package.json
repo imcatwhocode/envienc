@@ -1,6 +1,6 @@
 {
   "name": "envienc",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "private": false,
   "description": "🔐 Tool for dotenv values encryption",
   "repository": "https://github.com/imcatwhocode/envienc",

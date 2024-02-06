@@ -11,6 +11,6 @@ export function initAction({ glob }: { glob?: string[] }): never {
     salt: generateSalt(),
     globs: glob,
   });
-  logger.info('✌️ Created configuration:', path);
+  logger.info('Created configuration: %s', path);
   process.exit(0);
 }

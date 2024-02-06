@@ -1,4 +1,5 @@
 import { statSync } from 'node:fs';
+import { basename } from 'node:path';
 import type { GlobOptionsWithFileTypesFalse } from 'glob';
 import { globSync } from 'glob';
 
@@ -41,7 +42,9 @@ export function findEntries(
   patterns: string[],
   opts: GlobOptionsWithFileTypesFalse,
 ): string[] {
-  return globSync(patterns, opts).filter((p) => isFile(p));
+  return globSync(patterns, opts).filter(
+    (p) => basename(p) !== '.enviencrc' && isFile(p),
+  );
 }
 
 /**

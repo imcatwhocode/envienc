@@ -1,11 +1,5 @@
-/* eslint-disable no-console */
+import { pino } from 'pino';
 
-/**
- * Standard output implementation
- */
-export const out = console.log;
-
-/**
- * Error output implementation
- */
-export const err = console.error;
+export const logger = pino({
+  name: 'envienc',
+});

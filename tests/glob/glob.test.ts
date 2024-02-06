@@ -1,41 +1,48 @@
-import { join } from 'path';
+import { join, resolve } from 'node:path';
 import { findPlaintext, findEncrypted } from '../../src/glob';
 
+const initialCwd = process.cwd();
+
 test('enumerates plaintext .env in directory', () => {
-  expect(findPlaintext().length).toEqual(4);
+  process.chdir(resolve(__dirname, 'dir'));
 
   const paths = findPlaintext(undefined, { absolute: false });
+  process.chdir(initialCwd);
+
   expect(paths).toEqual([
-    'tests/glob/dir/.env',
-    'tests/glob/dir/foo/.env.prod',
-    'tests/glob/dir/foo/bar/.env.prod',
-    'tests/glob/dir/foo/bar/.env',
+    '.env',
+    'foo/.env.prod',
+    'foo/bar/.env.prod',
+    'foo/bar/.env',
   ]);
 });
 
 test('enumerates encrypted .env in directory', () => {
-  expect(findEncrypted().length).toEqual(4);
+  process.chdir(resolve(__dirname, 'dir'));
 
   const paths = findEncrypted(undefined, { absolute: false });
+  process.chdir(initialCwd);
+
   expect(paths).toEqual([
-    'tests/glob/dir/.env.envienc',
-    'tests/glob/dir/foo/.env.prod.envienc',
-    'tests/glob/dir/foo/bar/.env.prod.envienc',
-    'tests/glob/dir/foo/bar/.env.envienc',
+    '.env.envienc',
+    'foo/.env.prod.envienc',
+    'foo/bar/.env.prod.envienc',
+    'foo/bar/.env.envienc',
   ]);
 });
 
 test('enumerates custom .env globs correctly', () => {
+  process.chdir(resolve(__dirname, 'dir'));
+
   expect(
     findPlaintext([join(__dirname, 'dir/.env')], { absolute: false }),
-  ).toEqual(['tests/glob/dir/.env']);
+  ).toEqual(['.env']);
   expect(
     findPlaintext([join(__dirname, 'dir/.env.*')], { absolute: false }),
   ).toEqual([]);
   expect(
     findPlaintext([join(__dirname, 'dir/**/.env.*')], { absolute: false }),
-  ).toEqual([
-    'tests/glob/dir/foo/.env.prod',
-    'tests/glob/dir/foo/bar/.env.prod',
-  ]);
+  ).toEqual(['foo/.env.prod', 'foo/bar/.env.prod']);
+
+  process.chdir(initialCwd);
 });

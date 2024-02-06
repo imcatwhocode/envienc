@@ -1,0 +1,5 @@
+# Ignore artefacts
+dist/
+node_modules/
+coverage/
+tests/e2e/samples/

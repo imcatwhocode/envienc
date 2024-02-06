@@ -1,8 +1,6 @@
-[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://stand-with-ukraine.pp.ua)
-
 # envienc
 
-Envienc is a command-line tool for encrypting dotenv and YAML files, while keeping keys,
+Envienc is a command-line tool for encrypting dotenv, YAML and .h/.hpp files, while keeping keys,
 comments, and overall structure untouched.
 
 It encrypts only the values, leaving the rest of the file intact.
@@ -80,10 +78,10 @@ nested:
       keyB: valueB
 
 colors:
-  red: "#FF0000"
-  green: "#00FF00"
+  red: '#FF0000'
+  green: '#00FF00'
   # Flag below would prevent encryption only of "blue" entry
-  blue: "#0000FF" # @envienc no-encrypt
+  blue: '#0000FF' # @envienc no-encrypt
   random:
     rgb: [
         128,
@@ -91,14 +89,24 @@ colors:
         255, # @envienc no-encrypt
         64,
       ]
-    hex: "#FFFFFF"
+    hex: '#FFFFFF'
 
 # Entire "branding" entry will be kept unencrypted
 # @envienc no-encrypt
 branding:
-  logo_uri: "https://example.com/logo.png"
-  name: "My App"
-  description: "My App is a great app"
+  logo_uri: 'https://example.com/logo.png'
+  name: 'My App'
+  description: 'My App is a great app'
+```
+
+## For .H/.HPP
+
+```c
+// Will be encrypted
+#define SECURE_STUFF "my_sweetest_secret"
+
+// Will not be encrypted
+#define NON_SECURE_STUFF /* @envienc no-encrypt */ "not_secret_at_all"
 ```
 
 ## Encryption
@@ -115,5 +123,5 @@ Under the hood, envienc uses the AES-256-GCM algorithm to encrypt the values.
 You can provide the password in several ways. The order of precedence is as follows:
 
 1. Using the `--password` option. Please, don't ever do this in production.
-2. Using the `ENVIENC_PWD` environment variable.
+2. Using the `ENVIENC_PASSWORD` environment variable.
 3. Using the interactive prompt when encrypting or decrypting.

@@ -1,4 +1,4 @@
-name: Run Tests on PR to release
+name: Tests Release PR
 
 on:
   pull_request:
@@ -12,21 +12,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js
+      - name: Install Node
         uses: actions/setup-node@v3
         with:
-          node-version: "18.x"
+          node-version: '18.x'
 
-      - name: Install Dependencies
+      - name: Install deps
         run: npm ci
 
-      - name: Check compilation and linting errors
-        run: npx tsc --noEmit && npm run lint
+      - name: Lint and build
+        run: npm run lint && npm run build
 
-      - name: Run Tests with Coverage
+      - name: Run tests
         run: npm run test:coverage
 
-      - name: Upload Coverage to Codecov
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

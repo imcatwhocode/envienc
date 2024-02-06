@@ -1,79 +1,46 @@
-import { shouldSkip } from '../../flags';
-import { DecryptFile, EncryptFile } from '../../types';
-import {
-  EnvTreeNode, parse, stringify, RESERVED_KEYS,
-} from './parser';
+import type { DecryptFile, EncryptFile } from '../../types';
 
-export type Metadata = {
-  multilineMode?: 'RESOLVE' | 'ESCAPE',
-  followedByNewline?: boolean,
-};
+const PARSER_REGEXP =
+  /(?<begin>^|\n)(?:#(?:[ \t]*)(?<comment>@envienc no-encrypt)(?:\n))?(?<key>(?!#)[^\n=]+)=(?<value>[^\n]*)/g;
 
 const encryptFile: EncryptFile = (file, encryptor) => {
-  const content = parse(file);
-
-  // Encrypt each node
-  const nodes = Object
-    .entries(content)
-    .map(([key, value]) => {
-      // Skip reserved keys
-      if (RESERVED_KEYS.includes(key)) {
-        return [key, value];
+  return file.replaceAll(
+    PARSER_REGEXP,
+    (
+      substring: string,
+      begin: string,
+      comment: string,
+      key: string,
+      value: string,
+    ) => {
+      // If skip comment is present, do not encrypt
+      if (comment) {
+        return substring;
       }
 
-      const node = value as EnvTreeNode;
-      if (node.comments && shouldSkip(...node.comments)) {
-        return [key, node];
-      }
-
-      return [
-        key,
-        {
-          ...node,
-          // Encrypt value
-          value: encryptor(node.value, {
-            multilineMode: node.multilineMode,
-            followedByNewline: node.followedByNewline,
-          }),
-        },
-      ];
-    });
-
-  return stringify(Object.fromEntries(nodes));
+      return `${begin}${key}=${encryptor(value) as string}`;
+    },
+  );
 };
 
 const decryptFile: DecryptFile = (file, decryptor) => {
-  const content = parse(file);
-
-  // Decrypt each node
-  const nodes = Object
-    .entries(content)
-    .map(([key, entry]) => {
-      // Skip reserved keys
-      if (RESERVED_KEYS.includes(key)) {
-        return [key, entry];
+  return file.replaceAll(
+    PARSER_REGEXP,
+    (
+      substring: string,
+      begin: string,
+      comment: string,
+      key: string,
+      value: string,
+    ) => {
+      // Skip if comment is present or the value's preamble not found
+      if (comment || !value.startsWith('$EE2$')) {
+        return substring;
       }
 
-      const node = entry as EnvTreeNode;
-      if (node.comments && shouldSkip(...node.comments)) {
-        return [key, node];
-      }
-
-      const { data, metadata } = decryptor(node.value as string);
-      const meta = metadata as Metadata;
-      return [
-        key,
-        {
-          ...node,
-          value: data,
-          // Fallback to "ESCAPE" mode if not specified
-          multilineMode: meta?.multilineMode ?? 'ESCAPE',
-          followedByNewline: meta?.followedByNewline,
-        },
-      ];
-    });
-
-  return stringify(Object.fromEntries(nodes));
+      return `${begin}${key}=${decryptor(value).data as string}`;
+    },
+  );
 };
 
-export default { encryptFile, decryptFile };
+export { encryptFile, decryptFile };

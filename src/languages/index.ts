@@ -1,6 +1,7 @@
-import { Parser } from '../types';
-import dotenv from './dotenv';
-import yaml from './yaml';
+import type { Parser } from '../types';
+import * as dotenv from './dotenv';
+import * as yaml from './yaml';
+import * as cPreprocessor from './c-preprocessor';
 
 /**
  * Simple heuristic to determine if a file is YAML-like.
@@ -16,13 +17,22 @@ const YAML_LIKE_REGEX = /^\s*[^#\s]+:\s*.+$/;
  */
 const DOTENV_LIKE_REGEX = /^[A-Z_]+=.+$/gm;
 
+/**
+ * Simple heuristic to determine if a file is a c-preprocessor-like file
+ */
+const C_PREPROCESSOR_LIKE_REGEX = /^(?<define>\s*)#define/gm;
+
 const getParserUsingHeuristics = (name: string, contents: string): Parser => {
-  if (contents.match(YAML_LIKE_REGEX)) {
+  if (YAML_LIKE_REGEX.exec(contents)) {
     return yaml;
   }
 
   if (contents.match(DOTENV_LIKE_REGEX)) {
     return dotenv;
+  }
+
+  if (contents.match(C_PREPROCESSOR_LIKE_REGEX)) {
+    return cPreprocessor;
   }
 
   throw new Error(`Could not determine file type: ${name}`);
@@ -40,6 +50,10 @@ export function getParser(name: string, contents: string): Parser {
 
   if (name.startsWith('.env')) {
     return dotenv;
+  }
+
+  if (name.endsWith('.h') || name.endsWith('.hpp') || name.endsWith('.h++')) {
+    return cPreprocessor;
   }
 
   return getParserUsingHeuristics(name, contents);

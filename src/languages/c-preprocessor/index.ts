@@ -26,6 +26,6 @@ export const decryptFile: DecryptFile = (file, decryptor) =>
         throw new Error('Invalid ciphertext');
       }
 
-      return `${prefixGroup}${decryptor(unarmored).data}`;
+      return `${prefixGroup}${decryptor(unarmored).data as string}`;
     },
   );

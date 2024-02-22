@@ -109,6 +109,16 @@ branding:
 #define NON_SECURE_STUFF /* @envienc no-encrypt */ "not_secret_at_all"
 ```
 
+## Log
+
+Envienc uses `pino` for logging. By default, output is prettified using `pino-pretty` package.
+If you want to output logs in default JSON format, set `LOG_JSON` environment variable to `true`.
+
+```bash
+# This will output logs in Pino's default JSON format
+LOG_JSON=true npx envienc encrypt
+```
+
 ## Encryption
 
 Under the hood, envienc uses the AES-256-GCM algorithm to encrypt the values.

@@ -1,6 +1,6 @@
 {
   "name": "envienc",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "private": false,
   "description": "🔐 Encrypt dotenv, YAML and Hpp values keeping the rest of file intact",
   "repository": "https://github.com/imcatwhocode/envienc",

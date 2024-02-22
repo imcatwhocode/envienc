@@ -6,6 +6,13 @@ import { EXTENSION, findPlaintext } from '../glob';
 import { logger } from '../output';
 import { getParser } from '../languages';
 
+function exitWithPasswordError(): never {
+  logger.error(
+    'Password is missing. Provide it via "-p <password>" argument, "ENVIENC_PASSWORD" environment variable or enter manually on prompt.',
+  );
+  process.exit(1);
+}
+
 /**
  * Implements "encrypt" action
  * @param opts - Arguments
@@ -22,7 +29,7 @@ export async function encryptAction(
     passwordArgument ?? process.env.ENVIENC_PASSWORD ?? process.env.ENVIENC_PWD;
   if (!config) {
     logger.error(
-      'Configuration file is missing. Initialize first with "envienc init"',
+      'Configuration file is missing. Initialize with "envienc init" first.',
     );
     process.exit(1);
   }
@@ -33,11 +40,10 @@ export async function encryptAction(
         type: 'password',
         name: 'password',
         message: '🔑 Encryption password:',
+        onCancel: exitWithPasswordError,
       });
       if (!input.password) {
-        throw new Error(
-          'Password is missing. Provide it via "-p <password>" argument, "ENVIENC_PASSWORD" environment variable or enter manually on prompt.',
-        );
+        exitWithPasswordError();
       }
 
       password = input.password;

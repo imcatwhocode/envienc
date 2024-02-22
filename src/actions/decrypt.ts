@@ -6,6 +6,13 @@ import { findEncrypted } from '../glob';
 import { getParser } from '../languages';
 import { logger } from '../output';
 
+function exitWithPasswordError(): never {
+  logger.error(
+    'Password is missing. Provide it via "-p <password>" argument, "ENVIENC_PASSWORD" environment variable or enter manually on prompt.',
+  );
+  process.exit(1);
+}
+
 /**
  * Implements "decrypt" action
  * @param opts - Arguments
@@ -33,11 +40,11 @@ export async function decryptAction(
         type: 'password',
         name: 'password',
         message: '🔑 Encryption password:',
+        onCancel: exitWithPasswordError,
       });
+
       if (!input.password) {
-        throw new Error(
-          'Password is missing. Provide it via "-p <password>" argument, "ENVIENC_PASSWORD" environment variable or enter manually on prompt.',
-        );
+        exitWithPasswordError();
       }
 
       password = input.password;
@@ -68,13 +75,29 @@ export async function decryptAction(
   const changes: [string, string][] = paths.map((path) => {
     let contents = readFileSync(path, 'utf-8');
     const { decryptFile } = getParser(path, contents);
-    contents = decryptFile(contents, decryptor);
+
+    try {
+      contents = decryptFile(contents, decryptor);
+    } catch (err) {
+      // I wish Node had a better way to filter that error, but it doesn't
+      if (
+        (err as Error).message ===
+        'Unsupported state or unable to authenticate data'
+      ) {
+        logger.error(
+          `Password is incorrect or encrypted data is corrupted for: %s`,
+          path,
+        );
+        process.exit(1);
+      }
+      throw err;
+    }
     return [path.split('.').slice(0, -1).join('.'), contents];
   });
 
   changes.forEach(([path, contents]) => {
     writeFileSync(path, contents, 'utf-8');
-    logger.info('Decrypted:', path);
+    logger.info('Decrypted: %s', path);
   });
 
   logger.info('Done!');
